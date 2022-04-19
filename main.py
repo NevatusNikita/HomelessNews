@@ -1,6 +1,8 @@
 # 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 - токен для github
 from flask import Flask, render_template, redirect, request, make_response, session, jsonify
 from werkzeug.exceptions import abort
+from bs4 import BeautifulSoup
+import requests
 
 from api import news_api, jobs_api
 from data import db_session
@@ -24,6 +26,35 @@ api.add_resource(news_resources.NewsListResource, '/api/v2/news')
 
 # для одного объекта
 api.add_resource(news_resources.NewsResource, '/api/v2/news/<int:news_id>')
+
+
+def search_news(url, class_, teg):
+    news_url = []
+    titles = []
+    news_text = []
+    request = requests.get(url)
+    soup = BeautifulSoup(request.text, 'html.parser')
+    economics_news = soup.find_all(teg, class_=class_)
+    for news in economics_news:
+        lst = str(news).split()
+        ind = str(news.text)
+        titles.append(news.text[:ind.find(':') - 2])
+        for el in lst:
+            if el[:4] == 'href':
+                if el[6] == '/':
+                    news_url.append('https://lenta.ru' + el[6:el.rfind('/') + 1])
+                else:
+                    news_url.append(el[6:el.rfind('/') + 1])
+    for elem in news_url:
+        request2 = requests.get(elem)
+        soup = BeautifulSoup(request2.text, 'html.parser')
+        elem_text = soup.find_all('div', class_='topic-body__content')
+        if elem_text == list():
+            news_text.append(elem)
+        else:
+            for e in elem_text:
+                news_text.append(e.text)
+    return titles, news_text
 
 
 @app.route("/")
@@ -58,28 +89,127 @@ def reqister():
     return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route("/session_test")
-def session_test():
-    visits_count = session.get('visits_count', 0)
-    session['visits_count'] = visits_count + 1
-    return make_response(
-        f"Вы пришли на эту страницу {visits_count + 1} раз")
+@app.route('/news/economics', methods=['GET', 'POST'])
+def economics_news():
+    titles_ec = []
+    news_text_ec = []
+    titles_ec, news_text_ec = search_news('https://lenta.ru/rubrics/economics/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_ec)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_ec[j]).first()
+        if not data:
+            news.title = titles_ec[j]
+            news.content = news_text_ec[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
 
 
-@app.route("/cookie_test")
-def cookie_test():
-    visits_count = int(request.cookies.get("visits_count", 0))
-    if visits_count:
-        res = make_response(
-            f"Вы пришли на эту страницу {visits_count + 1} раз")
-        res.set_cookie("visits_count", str(visits_count + 1),
-                       max_age=60 * 60 * 24 * 365 * 2)
-    else:
-        res = make_response(
-            "Вы пришли на эту страницу в первый раз за последние 2 года")
-        res.set_cookie("visits_count", '1',
-                       max_age=60 * 60 * 24 * 365 * 2)
-    return res
+@app.route('/news/politics', methods=['GET', 'POST'])
+def politics_news():
+    titles_pol = []
+    news_text_pol = []
+    titles_pol, news_text_pol = search_news('https://lenta.ru/rubrics/world/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_pol)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_pol[j]).first()
+        if not data:
+            news.title = titles_pol[j]
+            news.content = news_text_pol[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
+
+
+@app.route('/news/science', methods=['GET', 'POST'])
+def science_news():
+    titles_sc, news_text_sc = search_news('https://lenta.ru/rubrics/science/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_sc)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_sc[j]).first()
+        if not data:
+            news.title = titles_sc[j]
+            news.content = news_text_sc[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
+
+
+@app.route('/news/culture', methods=['GET', 'POST'])
+def culture_news():
+    titles_cu, news_text_cu = search_news('https://lenta.ru/rubrics/culture/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_cu)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_cu[j]).first()
+        if not data:
+            news.title = titles_cu[j]
+            news.content = news_text_cu[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
+
+
+@app.route('/news/foreign_news', methods=['GET', 'POST'])
+def foreign_news():
+    titles_fr, news_text_fr = search_news('https://lenta.ru/rubrics/world/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_fr)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_fr[j]).first()
+        if not data:
+            news.title = titles_fr[j]
+            news.content = news_text_fr[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
+
+
+@app.route('/news/CIS_news', methods=['GET', 'POST'])
+def cis_news():
+    titles_us, news_text_us = search_news('https://lenta.ru/rubrics/ussr/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_us)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_us[j]).first()
+        if not data:
+            news.title = titles_us[j]
+            news.content = news_text_us[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
+
+
+@app.route('/news/travel', methods=['GET', 'POST'])
+def travel_news():
+    titles_tr, news_text_tr = search_news('https://lenta.ru/rubrics/travel/', 'card-mini _longgrid', 'a')
+    for j in range(len(titles_tr)):
+        db_sess = db_session.create_session()
+        news = News()
+        data = db_sess.query(News).filter_by(title=titles_tr[j]).first()
+        if not data:
+            news.title = titles_tr[j]
+            news.content = news_text_tr[j]
+            news.is_private = False
+            current_user.news.append(news)
+            db_sess.merge(current_user)
+            db_sess.commit()
+    return redirect('/')
 
 
 @app.route('/login', methods=['GET', 'POST'])
