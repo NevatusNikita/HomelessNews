@@ -21,10 +21,19 @@
    #politic_news_button {
     background-color: rgba(221, 25, 225, 0.45); /* Цвет фона под заголовком */
    }
-   #it_news_button {
+   #science_news_button {
     background-color: rgba(221, 25, 225, 0.45); /* Цвет фона под заголовком */
    }
    #culture_news_button {
+    background-color: rgba(221, 25, 225, 0.45); /* Цвет фона под заголовком */
+   }
+   #foreign_news_button {
+    background-color: rgba(221, 25, 225, 0.45); /* Цвет фона под заголовком */
+   }
+   #cis_news_button {
+    background-color: rgba(221, 25, 225, 0.45); /* Цвет фона под заголовком */
+   }
+   #travel_news_button {
     background-color: rgba(221, 25, 225, 0.45); /* Цвет фона под заголовком */
    }
 
@@ -32,10 +41,13 @@
 <body id="main">
     <h1>Записи в блоге</h1>
     <p>
-        <a href="/news/economics" id="economic_news_button" class="btn btn-secondary">Экономические новости</a>
-        <a href="/news/politics" id="politic_news_button" class="btn btn-secondary">Политические новости</a>
-        <a href="/news/science" id="it_news_button" class="btn btn-secondary">Новости IT сферы</a>
-        <a href="/news/culture" id="culture_news_button" class="btn btn-secondary">Новости культуры</a>
+         <a href="/news/economics" id="economic_news_button" class="btn btn-secondary">Экономика</a>
+        <a href="/news/politics" id="politic_news_button" class="btn btn-secondary">Политика</a>
+        <a href="/news/science" id="science_news_button" class="btn btn-secondary">Наука</a>
+        <a href="/news/culture" id="culture_news_button" class="btn btn-secondary">Культура</a>
+        <a href="/news/foreign_news" id="foreign_news_button" class="btn btn-secondary">Мир</a>
+        <a href="/news/CIS_news" id="cis_news_button" class="btn btn-secondary">СНГ</a>
+        <a href="/news/travel" id="travel_news_button" class="btn btn-secondary">Путешествия</a>
     </p>
     {% if current_user.is_authenticated %}
     <a href="news" class="btn btn-secondary">Добавить новость</a>

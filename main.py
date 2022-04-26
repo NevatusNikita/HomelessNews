@@ -134,7 +134,8 @@ def politics_news():
             current_user.politics_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(PoliticsNews).filter(PoliticsNews.is_private != True)
+    return render_template("politics_news.html", news=news)
 
 
 @app.route('/news/science', methods=['GET', 'POST'])
@@ -150,7 +151,8 @@ def science_news():
             current_user.science_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(ScienceNews).filter(ScienceNews.is_private != True)
+    return render_template("science_news.html", news=news)
 
 
 @app.route('/news/culture', methods=['GET', 'POST'])
@@ -166,7 +168,8 @@ def culture_news():
             current_user.culture_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(CultureNews).filter(CultureNews.is_private != True)
+    return render_template("culture_news.html", news=news)
 
 
 @app.route('/news/foreign_news', methods=['GET', 'POST'])
@@ -182,7 +185,8 @@ def foreign_news():
             current_user.foreign_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(ForeignNews).filter(ForeignNews.is_private != True)
+    return render_template("foreign_news.html", news=news)
 
 @app.route('/news/CIS_news', methods=['GET', 'POST'])
 def cis_news():
@@ -197,7 +201,8 @@ def cis_news():
             current_user.cis_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(CISNews).filter(CISNews.is_private != True)
+    return render_template("cis_news.html", news=news)
 
 
 @app.route('/news/travel', methods=['GET', 'POST'])
@@ -213,7 +218,8 @@ def travel_news():
             current_user.travel_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(CultureNews).filter(CultureNews.is_private != True)
+    return render_template("travel_news.html", news=news)
 
 
 @app.route('/login', methods=['GET', 'POST'])
