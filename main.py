@@ -8,6 +8,13 @@ from api import news_api, jobs_api
 from data import db_session
 from data.news import News
 from data.users import User
+from data.economics_news import EconomicNews
+from data.politics_news import PoliticsNews
+from data.science_news import ScienceNews
+from data.culture_news import CultureNews
+from data.cis_news import CISNews
+from data.foreign_news import ForeignNews
+from data.travel_news import TravelNews
 from forms.news import NewsForm
 from forms.user import RegisterForm, LoginForm
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -26,6 +33,9 @@ api.add_resource(news_resources.NewsListResource, '/api/v2/news')
 
 # для одного объекта
 api.add_resource(news_resources.NewsResource, '/api/v2/news/<int:news_id>')
+economics_lst = []
+politics_lst = []
+science_lst = []
 
 
 def search_news(url, class_, teg):
@@ -65,7 +75,12 @@ def index():
             (News.user == current_user) | (News.is_private != True))
     else:
         news = db_sess.query(News).filter(News.is_private != True)
-    return render_template("index.html", news=news)
+
+    count = 0
+    for item in news:
+        count += 1
+
+    return render_template("index.html", news=news, count=count)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -91,37 +106,32 @@ def reqister():
 
 @app.route('/news/economics', methods=['GET', 'POST'])
 def economics_news():
-    titles_ec = []
-    news_text_ec = []
     titles_ec, news_text_ec = search_news('https://lenta.ru/rubrics/economics/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_ec)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_ec[j]).first()
-        if not data:
-            news.title = titles_ec[j]
-            news.content = news_text_ec[j]
+    db_sess = db_session.create_session()
+    for t in titles_ec[:20]:
+        if t not in economics_lst:
+            news = EconomicNews()
+            news.title = t
+            news.content = news_text_ec[titles_ec.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.economics_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
-    return redirect('/')
+        news = db_sess.query(EconomicNews).filter(EconomicNews.is_private != True)
+    return render_template("economics_news.html", news=news)
 
 
 @app.route('/news/politics', methods=['GET', 'POST'])
 def politics_news():
-    titles_pol = []
-    news_text_pol = []
     titles_pol, news_text_pol = search_news('https://lenta.ru/rubrics/world/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_pol)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_pol[j]).first()
-        if not data:
-            news.title = titles_pol[j]
-            news.content = news_text_pol[j]
+    db_sess = db_session.create_session()
+    for t in titles_pol[:20]:
+        if t not in politics_lst:
+            news = PoliticsNews()
+            news.title = t
+            news.content = news_text_pol[titles_pol.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.politics_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
     return redirect('/')
@@ -130,15 +140,14 @@ def politics_news():
 @app.route('/news/science', methods=['GET', 'POST'])
 def science_news():
     titles_sc, news_text_sc = search_news('https://lenta.ru/rubrics/science/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_sc)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_sc[j]).first()
-        if not data:
-            news.title = titles_sc[j]
-            news.content = news_text_sc[j]
+    db_sess = db_session.create_session()
+    for t in titles_sc[:20]:
+        if t not in science_lst:
+            news = ScienceNews()
+            news.title = t
+            news.content = news_text_sc[titles_sc.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.science_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
     return redirect('/')
@@ -147,15 +156,14 @@ def science_news():
 @app.route('/news/culture', methods=['GET', 'POST'])
 def culture_news():
     titles_cu, news_text_cu = search_news('https://lenta.ru/rubrics/culture/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_cu)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_cu[j]).first()
-        if not data:
-            news.title = titles_cu[j]
-            news.content = news_text_cu[j]
+    db_sess = db_session.create_session()
+    for t in titles_cu[:20]:
+        if t not in science_lst:
+            news = CultureNews()
+            news.title = t
+            news.content = news_text_cu[titles_cu.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.culture_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
     return redirect('/')
@@ -164,32 +172,29 @@ def culture_news():
 @app.route('/news/foreign_news', methods=['GET', 'POST'])
 def foreign_news():
     titles_fr, news_text_fr = search_news('https://lenta.ru/rubrics/world/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_fr)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_fr[j]).first()
-        if not data:
-            news.title = titles_fr[j]
-            news.content = news_text_fr[j]
+    db_sess = db_session.create_session()
+    for t in titles_fr[:20]:
+        if t not in science_lst:
+            news = ForeignNews()
+            news.title = t
+            news.content = news_text_fr[titles_fr.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.foreign_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
     return redirect('/')
 
-
 @app.route('/news/CIS_news', methods=['GET', 'POST'])
 def cis_news():
     titles_us, news_text_us = search_news('https://lenta.ru/rubrics/ussr/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_us)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_us[j]).first()
-        if not data:
-            news.title = titles_us[j]
-            news.content = news_text_us[j]
+    db_sess = db_session.create_session()
+    for t in titles_us[:20]:
+        if t not in science_lst:
+            news = CISNews()
+            news.title = t
+            news.content = news_text_us[titles_us.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.cis_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
     return redirect('/')
@@ -198,15 +203,14 @@ def cis_news():
 @app.route('/news/travel', methods=['GET', 'POST'])
 def travel_news():
     titles_tr, news_text_tr = search_news('https://lenta.ru/rubrics/travel/', 'card-mini _longgrid', 'a')
-    for j in range(len(titles_tr)):
-        db_sess = db_session.create_session()
-        news = News()
-        data = db_sess.query(News).filter_by(title=titles_tr[j]).first()
-        if not data:
-            news.title = titles_tr[j]
-            news.content = news_text_tr[j]
+    db_sess = db_session.create_session()
+    for t in titles_tr[:20]:
+        if t not in science_lst:
+            news = CultureNews()
+            news.title = t
+            news.content = news_text_tr[titles_tr.index(t)]
             news.is_private = False
-            current_user.news.append(news)
+            current_user.travel_news.append(news)
             db_sess.merge(current_user)
             db_sess.commit()
     return redirect('/')
