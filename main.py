@@ -1,4 +1,6 @@
 # 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 - токен для github
+import os
+
 from flask import Flask, render_template, redirect, request, make_response, session, jsonify
 from werkzeug.exceptions import abort
 from bs4 import BeautifulSoup
@@ -327,4 +329,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
