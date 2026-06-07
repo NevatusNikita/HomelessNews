@@ -1,4 +1,3 @@
-# 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 - токен для github
 import os
 
 from flask import Flask, render_template, redirect, request, make_response, session, jsonify
